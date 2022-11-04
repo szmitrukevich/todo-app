@@ -9,9 +9,11 @@ import './App.css'
 
 let maxId = 100
 
-function createToDoItem(label) {
+function createToDoItem(label, min, sec) {
   return {
     label,
+    min,
+    sec,
     done: false,
     edited: false,
     id: (maxId += 1),
@@ -26,17 +28,17 @@ export default class App extends React.Component {
 
     this.state = {
       toDoData: [
-        this.createToDoItem('First task'),
-        this.createToDoItem('Second task'),
-        this.createToDoItem('Third task'),
+        this.createToDoItem('First task', 10, 10),
+        this.createToDoItem('Second task', 10, 10),
+        this.createToDoItem('Third task', 10, 10),
       ],
 
       filter: 'all',
     }
   }
 
-  addItem = (text) => {
-    const newItem = this.createToDoItem(text)
+  addItem = (text, min, sec) => {
+    const newItem = this.createToDoItem(text, min, sec)
 
     this.setState(({ toDoData }) => {
       const newArray = [...toDoData, newItem]

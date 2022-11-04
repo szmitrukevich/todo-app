@@ -9,17 +9,33 @@ export default class Task extends React.Component {
     super(props)
     this.state = {
       date: new Date(),
+      // eslint-disable-next-line react/destructuring-assignment
+      timerLeft: localStorage.getItem(this.props.id),
     }
   }
 
   componentDidMount() {
+    const { id } = this.props
     this.updateDate()
-
-    this.timerID = setInterval(() => this.updateDate(), 45000)
+    this.cretatedID = setInterval(() => this.updateDate(), 45000)
+    // eslint-disable-next-line react/destructuring-assignment
+    const x = new Date(this.props.min * 60000 + this.props.sec * 1000).getTime()
+    localStorage.setItem(id, x)
   }
 
   componentWillUnmount() {
-    clearInterval(this.timerID)
+    const { id } = this.props
+    clearInterval(this.cretatedID)
+    clearInterval(this.timerId)
+    localStorage.removeItem(id)
+  }
+
+  onStart() {
+    this.timerId = setInterval(() => this.updateTimer(), 1000)
+  }
+
+  onPause() {
+    clearInterval(this.timerId)
   }
 
   updateDate() {
@@ -32,11 +48,22 @@ export default class Task extends React.Component {
     })
   }
 
+  updateTimer() {
+    const { timerLeft } = this.state
+    if (timerLeft === 0) {
+      this.setState({
+        timerLeft: 0,
+      })
+    } else {
+      this.setState({
+        timerLeft: timerLeft - 1000,
+      })
+    }
+  }
+
   render() {
     const { label, onDeleted, onToggleDone, done, edited } = this.props
-
-    const { date } = this.state
-
+    const { date, timerLeft } = this.state
     let classNames = ''
     let checked = false
 
@@ -48,7 +75,9 @@ export default class Task extends React.Component {
     if (edited) {
       classNames += ' editing'
     }
-
+    const x = new Date(+timerLeft)
+    const [minutes, seconds] = [x.getMinutes(), x.getSeconds()]
+    const timer = ` ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
     return (
       <li className={classNames}>
         <div className="view">
@@ -60,8 +89,23 @@ export default class Task extends React.Component {
             id="toggle"
           />
           <label htmlFor="toggle">
-            <span className="description">{label}</span>
-            <span className="created">created {formatDistanceToNow(date)} ago</span>
+            <span className="title">{label}</span>
+            <span className="description">
+              <button
+                className="icon icon-play"
+                type="button"
+                aria-label="play button"
+                onClick={this.onStart.bind(this)}
+              />
+              <button
+                className="icon icon-pause"
+                type="button"
+                aria-label="pause button"
+                onClick={this.onPause.bind(this)}
+              />
+              {timer}
+            </span>
+            <span className="description">created {formatDistanceToNow(date)} ago</span>
           </label>
           <button
             className="icon icon-edit"
@@ -87,6 +131,9 @@ Task.defaultProps = {
   onToggleDone: () => null,
   done: false,
   edited: false,
+  min: 0,
+  sec: 0,
+  id: 1,
 }
 
 Task.propTypes = {
@@ -96,4 +143,7 @@ Task.propTypes = {
   onToggleDone: PropTypes.func,
   done: PropTypes.bool,
   edited: PropTypes.bool,
+  min: PropTypes.number,
+  sec: PropTypes.number,
+  id: PropTypes.number,
 }

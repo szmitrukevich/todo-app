@@ -9,42 +9,78 @@ export default class NewTaskForm extends React.Component {
 
     this.state = {
       label: '',
+      min: '',
+      sec: '',
+      error: false,
     }
   }
 
-  onLabelChange = (e) => {
+  onChange = (e, field) => {
     this.setState({
-      label: e.target.value,
+      [field]: e.target.value,
     })
   }
 
   onSubmit = (e) => {
-    const { onItemAdded } = this.props
-    const { label } = this.state
     e.preventDefault()
-    onItemAdded(label)
-    this.setState({
-      label: '',
-    })
+    const { onItemAdded } = this.props
+    const { label, min, sec } = this.state
+    if (Number.isNaN(+min) || Number.isNaN(+sec) || +sec > 59) {
+      this.setState({
+        error: true,
+      })
+    } else {
+      onItemAdded(label, +min, +sec)
+      this.setState({
+        label: '',
+        min: '',
+        sec: '',
+        error: false,
+      })
+    }
   }
 
   render() {
-    const { label } = this.state
-
+    const { label, min, sec, error } = this.state
+    const warning = error ? <div className="warning">Enter a valid timer value</div> : null
     return (
       <header className="header">
         <h1>todos</h1>
         <form
-          className="form"
+          className="new-todo-form"
           onSubmit={this.onSubmit}
         >
           <input
+            type="submit"
+            className="new-todo-form_submit"
+          />
+          <input
             type="text"
             className="new-todo"
-            onChange={this.onLabelChange}
-            placeholder="What needs to be done?"
+            onChange={(e) => this.onChange(e, 'label')}
+            placeholder="Task"
+            required
             value={label}
           />
+          <input
+            type="text"
+            className="new-todo-form__timer"
+            onChange={(e) => this.onChange(e, 'min')}
+            placeholder="Min"
+            value={min}
+            required
+            maxLength="3"
+          />
+          <input
+            type="text"
+            className="new-todo-form__timer"
+            onChange={(e) => this.onChange(e, 'sec')}
+            placeholder="Sec"
+            value={sec}
+            required
+            maxLength="2"
+          />
+          {warning}
         </form>
       </header>
     )
