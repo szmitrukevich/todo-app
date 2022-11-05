@@ -7,6 +7,11 @@ import './Task.css'
 export default class Task extends React.Component {
   constructor(props) {
     super(props)
+    // eslint-disable-next-line react/destructuring-assignment
+    if (!localStorage.getItem(this.props.id)) {
+      // eslint-disable-next-line react/destructuring-assignment, max-len
+      localStorage.setItem(this.props.id, new Date(this.props.min * 60000 + this.props.sec * 1000).getTime())
+    }
     this.state = {
       date: new Date(),
       // eslint-disable-next-line react/destructuring-assignment
@@ -15,27 +20,23 @@ export default class Task extends React.Component {
   }
 
   componentDidMount() {
-    const { id } = this.props
     this.updateDate()
     this.cretatedID = setInterval(() => this.updateDate(), 45000)
-    // eslint-disable-next-line react/destructuring-assignment
-    const x = new Date(this.props.min * 60000 + this.props.sec * 1000).getTime()
-    localStorage.setItem(id, x)
   }
 
   componentWillUnmount() {
-    const { id } = this.props
     clearInterval(this.cretatedID)
-    clearInterval(this.timerId)
-    localStorage.removeItem(id)
   }
 
   onStart() {
-    this.timerId = setInterval(() => this.updateTimer(), 1000)
+    if (!this.timerId) {
+      this.timerId = setInterval(() => this.updateTimer(), 1000)
+    }
   }
 
   onPause() {
     clearInterval(this.timerId)
+    delete this.timerId
   }
 
   updateDate() {
@@ -50,14 +51,17 @@ export default class Task extends React.Component {
 
   updateTimer() {
     const { timerLeft } = this.state
-    if (timerLeft === 0) {
+    const { id } = this.props
+    if (timerLeft < 1000) {
       this.setState({
         timerLeft: 0,
       })
+      localStorage.setItem(id, 0)
     } else {
       this.setState({
         timerLeft: timerLeft - 1000,
       })
+      localStorage.setItem(id, timerLeft - 1000)
     }
   }
 
@@ -66,18 +70,17 @@ export default class Task extends React.Component {
     const { date, timerLeft } = this.state
     let classNames = ''
     let checked = false
-
     if (done) {
       classNames += ' completed'
       checked = true
     }
-
     if (edited) {
       classNames += ' editing'
     }
-    const x = new Date(+timerLeft)
-    const [minutes, seconds] = [x.getMinutes(), x.getSeconds()]
-    const timer = ` ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+    const y = new Date(+timerLeft)
+    const [hours, minutes, seconds] = [y.getHours(), y.getMinutes(), y.getSeconds()]
+    const min = (hours - 3) * 60 + minutes
+    const timer = ` ${min.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
     return (
       <li className={classNames}>
         <div className="view">
