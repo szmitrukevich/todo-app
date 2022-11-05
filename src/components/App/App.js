@@ -7,8 +7,6 @@ import TaskList from '../TaskList'
 
 import './App.css'
 
-let maxId = 100
-
 function createToDoItem(label, min, sec) {
   return {
     label,
@@ -16,7 +14,7 @@ function createToDoItem(label, min, sec) {
     sec,
     done: false,
     edited: false,
-    id: (maxId += 1),
+    id: Math.trunc(Math.random() * 1000),
     creationDate: new Date(),
   }
 }
@@ -28,9 +26,9 @@ export default class App extends React.Component {
 
     this.state = {
       toDoData: [
-        this.createToDoItem('First task', 10, 10),
-        this.createToDoItem('Second task', 10, 10),
-        this.createToDoItem('Third task', 10, 10),
+        this.createToDoItem('First task', 10, 0),
+        this.createToDoItem('Second task', 10, 0),
+        this.createToDoItem('Third task', 10, 0),
       ],
 
       filter: 'all',
