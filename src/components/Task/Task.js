@@ -3,81 +3,45 @@ import { formatDistanceToNow } from 'date-fns'
 import PropTypes from 'prop-types'
 
 import './Task.css'
+import Timer from '../Timer'
 
 export default class Task extends React.Component {
   constructor(props) {
     super(props)
-    this.state = {
-      date: new Date(),
-      // eslint-disable-next-line react/destructuring-assignment
-      timerLeft: localStorage.getItem(this.props.id),
-    }
+    this.state = { date: new Date() }
   }
 
   componentDidMount() {
-    const { id } = this.props
     this.updateDate()
     this.cretatedID = setInterval(() => this.updateDate(), 45000)
-    // eslint-disable-next-line react/destructuring-assignment
-    const x = new Date(this.props.min * 60000 + this.props.sec * 1000).getTime()
-    localStorage.setItem(id, x)
   }
 
   componentWillUnmount() {
-    const { id } = this.props
     clearInterval(this.cretatedID)
     clearInterval(this.timerId)
-    localStorage.removeItem(id)
-  }
-
-  onStart() {
-    this.timerId = setInterval(() => this.updateTimer(), 1000)
-  }
-
-  onPause() {
-    clearInterval(this.timerId)
+    delete this.timerId
   }
 
   updateDate() {
     this.setState(() => {
       const { creationDate } = this.props
 
-      return {
-        date: creationDate,
-      }
+      return { date: creationDate }
     })
   }
 
-  updateTimer() {
-    const { timerLeft } = this.state
-    if (timerLeft === 0) {
-      this.setState({
-        timerLeft: 0,
-      })
-    } else {
-      this.setState({
-        timerLeft: timerLeft - 1000,
-      })
-    }
-  }
-
   render() {
-    const { label, onDeleted, onToggleDone, done, edited } = this.props
-    const { date, timerLeft } = this.state
+    const { label, onDeleted, onToggleDone, done, edited, id, min, sec } = this.props
+    const { date } = this.state
     let classNames = ''
     let checked = false
-
     if (done) {
       classNames += ' completed'
       checked = true
     }
-
     if (edited) {
       classNames += ' editing'
     }
-    const x = new Date(+timerLeft)
-    const [minutes, seconds] = [x.getMinutes(), x.getSeconds()]
-    const timer = ` ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
     return (
       <li className={classNames}>
         <div className="view">
@@ -86,25 +50,16 @@ export default class Task extends React.Component {
             type="checkbox"
             onClick={onToggleDone}
             defaultChecked={checked}
-            id="toggle"
+            id={id}
           />
-          <label htmlFor="toggle">
+          <label htmlFor={id}>
             <span className="title">{label}</span>
-            <span className="description">
-              <button
-                className="icon icon-play"
-                type="button"
-                aria-label="play button"
-                onClick={this.onStart.bind(this)}
-              />
-              <button
-                className="icon icon-pause"
-                type="button"
-                aria-label="pause button"
-                onClick={this.onPause.bind(this)}
-              />
-              {timer}
-            </span>
+            <Timer
+              id={id}
+              min={min}
+              sec={sec}
+              checked={checked}
+            />
             <span className="description">created {formatDistanceToNow(date)} ago</span>
           </label>
           <button

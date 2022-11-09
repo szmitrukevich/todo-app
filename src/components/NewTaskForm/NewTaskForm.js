@@ -16,19 +16,15 @@ export default class NewTaskForm extends React.Component {
   }
 
   onChange = (e, field) => {
-    this.setState({
-      [field]: e.target.value,
-    })
+    this.setState({ [field]: e.target.value })
   }
 
   onSubmit = (e) => {
     e.preventDefault()
     const { onItemAdded } = this.props
     const { label, min, sec } = this.state
-    if (Number.isNaN(+min) || Number.isNaN(+sec) || +sec > 59) {
-      this.setState({
-        error: true,
-      })
+    if (Number.isNaN(+min) || Number.isNaN(+sec) || (+sec > 59 && +sec < 0) || +min < 0) {
+      this.setState({ error: true })
     } else {
       onItemAdded(label, +min, +sec)
       this.setState({
@@ -87,10 +83,6 @@ export default class NewTaskForm extends React.Component {
   }
 }
 
-NewTaskForm.defaultProps = {
-  onItemAdded: () => null,
-}
+NewTaskForm.defaultProps = { onItemAdded: () => null }
 
-NewTaskForm.propTypes = {
-  onItemAdded: PropTypes.func,
-}
+NewTaskForm.propTypes = { onItemAdded: PropTypes.func }

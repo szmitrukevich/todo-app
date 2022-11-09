@@ -7,8 +7,6 @@ import TaskList from '../TaskList'
 
 import './App.css'
 
-let maxId = 100
-
 function createToDoItem(label, min, sec) {
   return {
     label,
@@ -16,7 +14,7 @@ function createToDoItem(label, min, sec) {
     sec,
     done: false,
     edited: false,
-    id: (maxId += 1),
+    id: Math.trunc(Math.random() * 1000),
     creationDate: new Date(),
   }
 }
@@ -28,9 +26,9 @@ export default class App extends React.Component {
 
     this.state = {
       toDoData: [
-        this.createToDoItem('First task', 10, 10),
-        this.createToDoItem('Second task', 10, 10),
-        this.createToDoItem('Third task', 10, 10),
+        this.createToDoItem('First task', 10, 0),
+        this.createToDoItem('Second task', 10, 0),
+        this.createToDoItem('Third task', 10, 0),
       ],
 
       filter: 'all',
@@ -43,9 +41,7 @@ export default class App extends React.Component {
     this.setState(({ toDoData }) => {
       const newArray = [...toDoData, newItem]
 
-      return {
-        toDoData: newArray,
-      }
+      return { toDoData: newArray }
     })
   }
 
@@ -53,9 +49,7 @@ export default class App extends React.Component {
     this.setState(({ toDoData }) => {
       const newArray = toDoData.filter((el) => el.id !== id)
 
-      return {
-        toDoData: newArray,
-      }
+      return { toDoData: newArray }
     })
   }
 
@@ -72,9 +66,7 @@ export default class App extends React.Component {
 
       const newArray = [...toDoData.slice(0, idx), newItem, ...toDoData.slice(idx + 1)]
 
-      return {
-        toDoData: newArray,
-      }
+      return { toDoData: newArray }
     })
   }
 
@@ -82,16 +74,12 @@ export default class App extends React.Component {
     this.setState(({ toDoData }) => {
       const newArray = toDoData.filter((el) => !el.done)
 
-      return {
-        toDoData: newArray,
-      }
+      return { toDoData: newArray }
     })
   }
 
   updateFilter = (status) => {
-    this.setState(() => ({
-      filter: status,
-    }))
+    this.setState(() => ({ filter: status }))
   }
 
   filterTodoTasks = () => {
@@ -101,15 +89,17 @@ export default class App extends React.Component {
 
     if (filter === 'all') {
       filteredData = [...toDoData]
+    } else if (filter === 'active') {
+      filteredData = [...toDoData].filter((el) => !el.done)
     } else {
-      filteredData = [...toDoData].filter((el) => el.done === filter)
+      filteredData = [...toDoData].filter((el) => el.done)
     }
 
     return filteredData
   }
 
   render() {
-    const { toDoData } = this.state
+    const { toDoData, filter } = this.state
     const toDoCount = toDoData.filter((el) => !el.done).length
 
     return (
@@ -125,6 +115,7 @@ export default class App extends React.Component {
             toDo={toDoCount}
             clearCompleted={this.clearCompleted}
             updateFilter={this.updateFilter}
+            selectedBtn={filter}
           />
         </section>
       </div>
