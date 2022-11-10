@@ -23,7 +23,7 @@ export default class NewTaskForm extends React.Component {
     e.preventDefault()
     const { onItemAdded } = this.props
     const { label, min, sec } = this.state
-    if (Number.isNaN(+min) || Number.isNaN(+sec) || (+sec > 59 && +sec < 0) || +min < 0) {
+    if (Number.isNaN(+min) || Number.isNaN(+sec) || +sec > 59 || +sec < 0 || +min < 0) {
       this.setState({ error: true })
     } else {
       onItemAdded(label, +min, +sec)

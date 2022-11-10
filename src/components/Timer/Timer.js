@@ -4,30 +4,26 @@ import PropTypes from 'prop-types'
 export default class Timer extends React.Component {
   constructor(props) {
     super(props)
+    this.state = { timerLeft: null }
+  }
 
-    // eslint-disable-next-line react/destructuring-assignment
-    if (!localStorage.getItem(this.props.id)) {
-      // eslint-disable-next-line react/destructuring-assignment, max-len
-      localStorage.setItem(this.props.id, new Date(this.props.min * 60000 + this.props.sec * 1000).getTime())
+  componentDidMount() {
+    const { id, min, sec } = this.props
+    if (!localStorage.getItem(id)) {
+      localStorage.setItem(id, new Date(min * 60000 + sec * 1000).getTime())
     }
-
-    this.state = {
-      // eslint-disable-next-line react/destructuring-assignment
-      timerLeft: localStorage.getItem(this.props.id),
-    }
+    this.setState({ timerLeft: localStorage.getItem(id) })
   }
 
   componentDidUpdate(prevProps) {
     const { checked } = this.props
     if (checked !== prevProps.checked) {
       clearInterval(this.timerId)
-      delete this.timerId
     }
   }
 
   componentWillUnmount() {
     clearInterval(this.timerId)
-    delete this.timerId
   }
 
   onStart() {
@@ -38,7 +34,6 @@ export default class Timer extends React.Component {
 
   onPause() {
     clearInterval(this.timerId)
-    delete this.timerId
   }
 
   updateTimer() {
