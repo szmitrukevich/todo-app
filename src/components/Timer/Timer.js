@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 export default class Timer extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { timerLeft: null }
+    this.state = { timerLeft: null, timerId: null }
   }
 
   componentDidMount() {
@@ -17,32 +17,39 @@ export default class Timer extends React.Component {
 
   componentDidUpdate(prevProps) {
     const { checked } = this.props
+    const { timerId } = this.state
     if (checked !== prevProps.checked) {
-      clearInterval(this.timerId)
+      clearInterval(timerId)
+      this.setState({ timerId: null })
     }
   }
 
   componentWillUnmount() {
-    clearInterval(this.timerId)
+    const { timerId } = this.state
+    clearInterval(timerId)
+    this.setState({ timerId: null })
   }
 
   onStart() {
-    if (!this.timerId) {
-      this.timerId = setInterval(() => this.updateTimer(), 1000)
+    const { timerId } = this.state
+    if (!timerId) {
+      this.setState({ timerId: setInterval(() => this.updateTimer(), 1000) })
     }
   }
 
   onPause() {
-    clearInterval(this.timerId)
+    const { timerId } = this.state
+    clearInterval(timerId)
+    this.setState({ timerId: null })
   }
 
   updateTimer() {
-    const { timerLeft } = this.state
+    const { timerLeft, timerId } = this.state
     const { id } = this.props
     if (timerLeft < 100) {
       this.setState({ timerLeft: 0 })
       localStorage.setItem(id, 0)
-      clearInterval(this.timerId)
+      clearInterval(timerId)
     } else {
       this.setState({ timerLeft: timerLeft - 1000 })
       localStorage.setItem(id, timerLeft - 1000)
