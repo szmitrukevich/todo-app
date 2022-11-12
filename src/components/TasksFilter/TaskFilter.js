@@ -3,46 +3,40 @@ import PropTypes from 'prop-types'
 
 import './TaskFilter.css'
 
-const TaskFilter = ({ updateFilter }) => {
-  const classNames = 'selected'
+const TaskFilter = ({ updateFilter, selectedBtn }) => (
+  <ul className="filters">
+    <li>
+      <button
+        type="button"
+        className={selectedBtn === 'all' ? 'selected' : null}
+        onClick={() => updateFilter('all')}
+      >
+        All
+      </button>
+    </li>
+    <li>
+      <button
+        type="button"
+        className={selectedBtn === 'active' ? 'selected' : null}
+        onClick={() => updateFilter('active')}
+      >
+        Active{' '}
+      </button>
+    </li>
+    <li>
+      <button
+        type="button"
+        className={selectedBtn === 'completed' ? 'selected' : null}
+        onClick={() => updateFilter('completed')}
+      >
+        Completed{' '}
+      </button>
+    </li>
+  </ul>
+)
 
-  return (
-    <ul className="filters">
-      <li>
-        <button
-          type="button"
-          className={classNames}
-          onClick={() => updateFilter('all')}
-        >
-          All
-        </button>
-      </li>
-      <li>
-        <button
-          type="button"
-          onClick={() => updateFilter(false)}
-        >
-          Active{' '}
-        </button>
-      </li>
-      <li>
-        <button
-          type="button"
-          onClick={() => updateFilter(true)}
-        >
-          Completed{' '}
-        </button>
-      </li>
-    </ul>
-  )
-}
+TaskFilter.defaultProps = { updateFilter: () => null, selectedBtn: 'all' }
 
-TaskFilter.defaultProps = {
-  updateFilter: () => null,
-}
-
-TaskFilter.propTypes = {
-  updateFilter: PropTypes.func,
-}
+TaskFilter.propTypes = { updateFilter: PropTypes.func, selectedBtn: PropTypes.node }
 
 export default TaskFilter

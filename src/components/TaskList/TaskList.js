@@ -13,6 +13,7 @@ const TaskList = ({ todos, onDeleted, onToggleDone }) => {
       <Task
         /* eslint-disable react/jsx-props-no-spreading */
         {...itemProps}
+        id={id}
         key={id}
         onDeleted={() => onDeleted(id)}
         onToggleDone={() => onToggleDone(id)}
