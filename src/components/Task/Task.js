@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import './Task.css'
 import Timer from '../Timer'
 
-const Task = ({ label, onDeleted, onToggleDone, done, edited, id, min, sec, creationDate }) => {
+const Task = ({ label, onDeleted, onToggleDone, done, id, time, creationDate }) => {
   const [currentDate, setCurrentDate] = useState(new Date())
 
   useEffect(() => {
@@ -22,9 +22,6 @@ const Task = ({ label, onDeleted, onToggleDone, done, edited, id, min, sec, crea
     classNames += ' completed'
     checked = true
   }
-  if (edited) {
-    classNames += ' editing'
-  }
 
   return (
     <li className={classNames}>
@@ -40,8 +37,7 @@ const Task = ({ label, onDeleted, onToggleDone, done, edited, id, min, sec, crea
           <span className="title">{label}</span>
           <Timer
             id={id}
-            min={min}
-            sec={sec}
+            time={time}
             checked={checked}
           />
           <span className="description">
@@ -72,10 +68,8 @@ Task.defaultProps = {
   onDeleted: () => null,
   onToggleDone: () => null,
   done: false,
-  edited: false,
-  min: 0,
-  sec: 0,
-  id: 1,
+  time: 0,
+  id: '',
 }
 
 Task.propTypes = {
@@ -84,8 +78,6 @@ Task.propTypes = {
   onDeleted: PropTypes.func,
   onToggleDone: PropTypes.func,
   done: PropTypes.bool,
-  edited: PropTypes.bool,
-  min: PropTypes.number,
-  sec: PropTypes.number,
-  id: PropTypes.number,
+  time: PropTypes.number,
+  id: PropTypes.string,
 }

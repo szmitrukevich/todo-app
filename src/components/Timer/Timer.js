@@ -1,41 +1,32 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 
-const Timer = ({ id, checked, min, sec }) => {
-  const timerL = localStorage.getItem(id) ? localStorage.getItem(id) : new Date(min * 60000 + sec * 1000).getTime()
+const Timer = ({ id, checked, time }) => {
+  const timerL = localStorage.getItem(id) ? localStorage.getItem(id) : new Date(time * 1000).getTime()
   const [timerLeft, setTimerLeft] = useState(timerL)
-  const [started, setStarted] = useState()
+  const [started, setStarted] = useState(false)
 
+  const updateTimerInfo = (int, isStarted, isChecked, timeLeft, setStart, setTimer, idx) => {
+    if (!started || checked || timeLeft < 100) clearInterval(int)
+    if (checked) setStart(false)
+    if (timeLeft < 100) {
+      setTimer(0)
+      localStorage.setItem(idx, 0)
+    }
+  }
   useEffect(() => {
     if (!localStorage.getItem(id)) {
-      localStorage.setItem(id, new Date(min * 60000 + sec * 1000).getTime())
+      localStorage.setItem(id, new Date(time * 1000).getTime())
     }
     const interval = setInterval(() => {
       if (started) {
-        setTimerLeft((time) => {
-          localStorage.setItem(id, time - 1000)
-          return time - 1000
-        })
-      }
-      if (timerLeft < 500) {
-        setTimerLeft(() => {
-          localStorage.setItem(id, 0)
-          return 0
+        setTimerLeft((currTimer) => {
+          localStorage.setItem(id, currTimer - 1000)
+          return currTimer - 1000
         })
       }
     }, 1000)
-    if (!started) {
-      clearInterval(interval)
-    }
-
-    if (checked) {
-      clearInterval(interval)
-      setStarted(false)
-    }
-    if (timerLeft < 100) {
-      clearInterval(interval)
-      localStorage.setItem(id, 0)
-    }
+    updateTimerInfo(interval, started, checked, timerLeft, setStarted, setTimerLeft, id)
 
     return () => {
       clearInterval(interval)
@@ -53,9 +44,9 @@ const Timer = ({ id, checked, min, sec }) => {
     setStarted(false)
   }
 
-  const y = new Date(+timerLeft)
-  const [minutes, seconds] = [(y.getHours() - 3) * 60 + y.getMinutes(), y.getSeconds()]
-  const timer = y.getTime()
+  const timerData = new Date(+timerLeft)
+  const [minutes, seconds] = [(timerData.getHours() - 3) * 60 + timerData.getMinutes(), timerData.getSeconds()]
+  const timer = timerData.getTime()
     ? ` ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
     : 'Timer ran out'
   const startButton = !started ? (
@@ -77,7 +68,7 @@ const Timer = ({ id, checked, min, sec }) => {
     />
   ) : null
 
-  const buttons = y.getTime() ? [startButton, pauseButton] : null
+  const buttons = timerData.getTime() ? [startButton, pauseButton] : null
   return (
     <span className="description">
       {buttons}
@@ -87,15 +78,13 @@ const Timer = ({ id, checked, min, sec }) => {
 }
 export default Timer
 Timer.defaultProps = {
-  min: 0,
-  sec: 0,
-  id: 1,
+  time: 0,
+  id: '',
   checked: false,
 }
 
 Timer.propTypes = {
-  min: PropTypes.number,
-  sec: PropTypes.number,
-  id: PropTypes.number,
+  time: PropTypes.number,
+  id: PropTypes.string,
   checked: PropTypes.bool,
 }

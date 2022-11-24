@@ -33,7 +33,8 @@
     "implicit-arrow-linebreak": ["error", "beside"],
     "max-len": ["error", { "code": 120 }],
     "operator-linebreak": ["error", "after", { "overrides": { "?": "ignore", ":": "ignore" } }],
-    "indent": "off"
+    "indent": "off",
+    "react/jsx-props-no-spreading": ["error", {"custom": "ignore"}]
   },
   "settings": {
     "react": {

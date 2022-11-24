@@ -8,10 +8,8 @@ import './TaskList.css'
 const TaskList = ({ todos, onDeleted, onToggleDone }) => {
   const elements = todos.map((item) => {
     const { id, ...itemProps } = item
-
     return (
       <Task
-        /* eslint-disable react/jsx-props-no-spreading */
         {...itemProps}
         id={id}
         key={id}

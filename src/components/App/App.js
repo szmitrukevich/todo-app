@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 
 import Footer from '../Footer'
 import NewTaskForm from '../NewTaskForm'
@@ -8,65 +9,43 @@ import TaskList from '../TaskList'
 import './App.css'
 
 const App = () => {
-  const createToDoItem = (label, min, sec) => ({
+  const createToDoItem = (label, time) => ({
     label,
-    min,
-    sec,
+    time,
     done: false,
-    edited: false,
-    id: Math.trunc(Math.random() * 1000),
+    id: uuidv4(),
     creationDate: new Date(),
   })
 
   const [toDoData, setData] = useState([
-    createToDoItem('First task', 10, 0),
-    createToDoItem('Second task', 10, 0),
-    createToDoItem('Third task', 10, 0),
+    createToDoItem('First task', 600),
+    createToDoItem('Second task', 600),
+    createToDoItem('Third task', 600),
   ])
 
   const [filter, setFilter] = useState('all')
 
-  const addItem = (text, min, sec) => {
-    const newItem = createToDoItem(text, min, sec)
-
-    setData((prevtoDoData) => {
-      const newArray = [...prevtoDoData, newItem]
-
-      return newArray
-    })
+  const addItem = (text, time) => {
+    const newItem = createToDoItem(text, time)
+    setData([...toDoData, newItem])
   }
 
   const deleteItem = (id) => {
-    setData((prevtoDoData) => {
-      const newArray = prevtoDoData.filter((el) => el.id !== id)
-
-      return newArray
-    })
+    setData(toDoData.filter((el) => el.id !== id))
   }
 
   const onToggleDone = (id) => {
-    setData((prevtoDoData) => {
-      const idx = prevtoDoData.findIndex((el) => el.id === id)
-
-      const oldItem = prevtoDoData[idx]
-
-      const newItem = {
-        ...oldItem,
-        done: !oldItem.done,
-      }
-
-      const newArray = [...prevtoDoData.slice(0, idx), newItem, ...prevtoDoData.slice(idx + 1)]
-
-      return newArray
-    })
+    const idx = toDoData.findIndex((el) => el.id === id)
+    const oldItem = toDoData[idx]
+    const newItem = {
+      ...oldItem,
+      done: !oldItem.done,
+    }
+    setData([...toDoData.slice(0, idx), newItem, ...toDoData.slice(idx + 1)])
   }
 
   const clearCompleted = () => {
-    setData((prevtoDoData) => {
-      const newArray = prevtoDoData.filter((el) => !el.done)
-
-      return newArray
-    })
+    setData(toDoData.filter((el) => !el.done))
   }
 
   const updateFilter = (status) => {
@@ -86,7 +65,6 @@ const App = () => {
 
     return filteredData
   }
-  const toDoCount = toDoData.filter((el) => !el.done).length
 
   return (
     <div>
@@ -98,7 +76,7 @@ const App = () => {
           onToggleDone={onToggleDone}
         />
         <Footer
-          toDo={toDoCount}
+          toDo={toDoData}
           clearCompleted={clearCompleted}
           updateFilter={updateFilter}
           selectedBtn={filter}

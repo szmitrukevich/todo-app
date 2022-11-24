@@ -4,12 +4,6 @@ import './NewTaskForm.css'
 import PropTypes from 'prop-types'
 
 const NewTaskForm = ({ onItemAdded }) => {
-  // this.state = {
-  //   label: '',
-  //   min: '',
-  //   sec: '',
-  //   error: false,
-  // }
   const [data, setData] = useState({
     error: false,
     label: '',
@@ -34,7 +28,8 @@ const NewTaskForm = ({ onItemAdded }) => {
         error: true,
       }))
     } else {
-      onItemAdded(label, +min, +sec)
+      const time = min * 60 + sec
+      onItemAdded(label, +time)
       setData({
         label: '',
         min: '',
