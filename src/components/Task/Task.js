@@ -1,84 +1,66 @@
-import React from 'react'
-import { formatDistanceToNow } from 'date-fns'
+import React, { useEffect, useState } from 'react'
+import { formatDistance } from 'date-fns'
 import PropTypes from 'prop-types'
 
 import './Task.css'
+import Timer from '../Timer'
 
-export default class Task extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      date: new Date(),
-    }
+const Task = ({ label, onDeleted, onToggleDone, done, id, time, creationDate }) => {
+  const [currentDate, setCurrentDate] = useState(new Date())
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentDate(new Date())
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  let classNames = ''
+  let checked = false
+  if (done) {
+    classNames += ' completed'
+    checked = true
   }
 
-  componentDidMount() {
-    this.updateDate()
-
-    this.timerID = setInterval(() => this.updateDate(), 45000)
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.timerID)
-  }
-
-  updateDate() {
-    this.setState(() => {
-      const { creationDate } = this.props
-
-      return {
-        date: creationDate,
-      }
-    })
-  }
-
-  render() {
-    const { label, onDeleted, onToggleDone, done, edited } = this.props
-
-    const { date } = this.state
-
-    let classNames = ''
-    let checked = false
-
-    if (done) {
-      classNames += ' completed'
-      checked = true
-    }
-
-    if (edited) {
-      classNames += ' editing'
-    }
-
-    return (
-      <li className={classNames}>
-        <div className="view">
-          <input
-            className="toggle"
-            type="checkbox"
-            onClick={onToggleDone}
-            defaultChecked={checked}
-            id="toggle"
+  return (
+    <li className={classNames}>
+      <div className="view">
+        <input
+          className="toggle"
+          type="checkbox"
+          onClick={onToggleDone}
+          defaultChecked={checked}
+          id={id}
+        />
+        <label htmlFor={id}>
+          <span className="title">{label}</span>
+          <Timer
+            id={id}
+            time={time}
+            checked={checked}
           />
-          <label htmlFor="toggle">
-            <span className="description">{label}</span>
-            <span className="created">created {formatDistanceToNow(date)} ago</span>
-          </label>
-          <button
-            className="icon icon-edit"
-            type="button"
-            aria-label="edit button"
-          />
-          <button
-            className="icon icon-destroy"
-            onClick={onDeleted}
-            type="button"
-            aria-label="delete button"
-          />
-        </div>
-      </li>
-    )
-  }
+          <span className="description">
+            created {formatDistance(currentDate, creationDate, { includeSeconds: true })} ago
+          </span>
+        </label>
+        <button
+          className="icon icon-edit"
+          type="button"
+          aria-label="edit button"
+        />
+        <button
+          className="icon icon-destroy"
+          onClick={onDeleted}
+          type="button"
+          aria-label="delete button"
+        />
+      </div>
+    </li>
+  )
 }
+
+export default Task
 
 Task.defaultProps = {
   creationDate: new Date(),
@@ -86,7 +68,8 @@ Task.defaultProps = {
   onDeleted: () => null,
   onToggleDone: () => null,
   done: false,
-  edited: false,
+  time: 0,
+  id: '',
 }
 
 Task.propTypes = {
@@ -95,5 +78,6 @@ Task.propTypes = {
   onDeleted: PropTypes.func,
   onToggleDone: PropTypes.func,
   done: PropTypes.bool,
-  edited: PropTypes.bool,
+  time: PropTypes.number,
+  id: PropTypes.string,
 }

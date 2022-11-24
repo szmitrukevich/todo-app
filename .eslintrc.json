@@ -15,7 +15,7 @@
   "rules": {
     "semi": 0,
     "comma-dangle": 0,
-    "prettier/prettier": "error",
+    "prettier/prettier": ["error", {"endOfLine": "auto"}],
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
     "react/function-component-definition": [
       2,
@@ -24,14 +24,21 @@
       }
     ],
     "import-newlines/enforce": "error",
-    "no-return-assign" : "off",
+    "no-return-assign": "off",
     "linebreak-style": 0,
     "react/jsx-one-expression-per-line": "off",
-    "object-curly-newline": ["error", { "ObjectExpression": "always", "ObjectPattern": "never" }]
+    "object-curly-newline": ["error", { "multiline": true }],
+    "no-underscore-dangle": "off",
+    "function-paren-newline": "off",
+    "implicit-arrow-linebreak": ["error", "beside"],
+    "max-len": ["error", { "code": 120 }],
+    "operator-linebreak": ["error", "after", { "overrides": { "?": "ignore", ":": "ignore" } }],
+    "indent": "off",
+    "react/jsx-props-no-spreading": ["error", {"custom": "ignore"}]
   },
   "settings": {
     "react": {
-      "version": "defect"
+      "version": "detect"
     }
   }
 }

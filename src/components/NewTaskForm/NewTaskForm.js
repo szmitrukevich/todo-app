@@ -1,60 +1,89 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import './NewTaskForm.css'
 import PropTypes from 'prop-types'
 
-export default class NewTaskForm extends React.Component {
-  constructor() {
-    super()
+const NewTaskForm = ({ onItemAdded }) => {
+  const [data, setData] = useState({
+    error: false,
+    label: '',
+    min: '',
+    sec: '',
+  })
 
-    this.state = {
-      label: '',
+  const onChange = (e, field) => {
+    const { value } = e.target
+    setData((prevData) => ({
+      ...prevData,
+      [field]: value,
+    }))
+  }
+
+  const onSubmit = (e) => {
+    e.preventDefault()
+    const { label, min, sec } = data
+    if (Number.isNaN(+min) || Number.isNaN(+sec) || +sec > 59 || +sec < 0 || +min < 0) {
+      setData((prevData) => ({
+        ...prevData,
+        error: true,
+      }))
+    } else {
+      const time = min * 60 + sec
+      onItemAdded(label, +time)
+      setData({
+        label: '',
+        min: '',
+        sec: '',
+        error: false,
+      })
     }
   }
-
-  onLabelChange = (e) => {
-    this.setState({
-      label: e.target.value,
-    })
-  }
-
-  onSubmit = (e) => {
-    const { onItemAdded } = this.props
-    const { label } = this.state
-    e.preventDefault()
-    onItemAdded(label)
-    this.setState({
-      label: '',
-    })
-  }
-
-  render() {
-    const { label } = this.state
-
-    return (
-      <header className="header">
-        <h1>todos</h1>
-        <form
-          className="form"
-          onSubmit={this.onSubmit}
-        >
-          <input
-            type="text"
-            className="new-todo"
-            onChange={this.onLabelChange}
-            placeholder="What needs to be done?"
-            value={label}
-          />
-        </form>
-      </header>
-    )
-  }
+  const warning = data.error ? <div className="warning">Enter a valid timer value</div> : null
+  return (
+    <header className="header">
+      <h1>todos</h1>
+      <form
+        className="new-todo-form"
+        onSubmit={onSubmit}
+      >
+        <input
+          type="submit"
+          className="new-todo-form_submit"
+        />
+        <input
+          type="text"
+          className="new-todo"
+          onChange={(e) => onChange(e, 'label')}
+          placeholder="Task"
+          required
+          value={data.label}
+        />
+        <input
+          type="text"
+          className="new-todo-form__timer"
+          onChange={(e) => onChange(e, 'min')}
+          placeholder="Min"
+          value={data.min}
+          required
+          maxLength="3"
+        />
+        <input
+          type="text"
+          className="new-todo-form__timer"
+          onChange={(e) => onChange(e, 'sec')}
+          placeholder="Sec"
+          value={data.sec}
+          required
+          maxLength="2"
+        />
+        {warning}
+      </form>
+    </header>
+  )
 }
 
-NewTaskForm.defaultProps = {
-  onItemAdded: () => null,
-}
+export default NewTaskForm
 
-NewTaskForm.propTypes = {
-  onItemAdded: PropTypes.func,
-}
+NewTaskForm.defaultProps = { onItemAdded: () => null }
+
+NewTaskForm.propTypes = { onItemAdded: PropTypes.func }

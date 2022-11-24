@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 
 import Footer from '../Footer'
 import NewTaskForm from '../NewTaskForm'
@@ -7,125 +8,82 @@ import TaskList from '../TaskList'
 
 import './App.css'
 
-let maxId = 100
-
-function createToDoItem(label) {
-  return {
+const App = () => {
+  const createToDoItem = (label, time) => ({
     label,
+    time,
     done: false,
-    edited: false,
-    id: (maxId += 1),
+    id: uuidv4(),
     creationDate: new Date(),
+  })
+
+  const [toDoData, setData] = useState([
+    createToDoItem('First task', 600),
+    createToDoItem('Second task', 600),
+    createToDoItem('Third task', 600),
+  ])
+
+  const [filter, setFilter] = useState('all')
+
+  const addItem = (text, time) => {
+    const newItem = createToDoItem(text, time)
+    setData([...toDoData, newItem])
   }
-}
 
-export default class App extends React.Component {
-  constructor(props) {
-    super(props)
-    this.createToDoItem = createToDoItem.bind(this)
+  const deleteItem = (id) => {
+    setData(toDoData.filter((el) => el.id !== id))
+  }
 
-    this.state = {
-      toDoData: [
-        this.createToDoItem('First task'),
-        this.createToDoItem('Second task'),
-        this.createToDoItem('Third task'),
-      ],
-
-      filter: 'all',
+  const onToggleDone = (id) => {
+    const idx = toDoData.findIndex((el) => el.id === id)
+    const oldItem = toDoData[idx]
+    const newItem = {
+      ...oldItem,
+      done: !oldItem.done,
     }
+    setData([...toDoData.slice(0, idx), newItem, ...toDoData.slice(idx + 1)])
   }
 
-  addItem = (text) => {
-    const newItem = this.createToDoItem(text)
-
-    this.setState(({ toDoData }) => {
-      const newArray = [...toDoData, newItem]
-
-      return {
-        toDoData: newArray,
-      }
-    })
+  const clearCompleted = () => {
+    setData(toDoData.filter((el) => !el.done))
   }
 
-  deleteItem = (id) => {
-    this.setState(({ toDoData }) => {
-      const newArray = toDoData.filter((el) => el.id !== id)
-
-      return {
-        toDoData: newArray,
-      }
-    })
+  const updateFilter = (status) => {
+    setFilter(status)
   }
 
-  onToggleDone = (id) => {
-    this.setState(({ toDoData }) => {
-      const idx = toDoData.findIndex((el) => el.id === id)
-
-      const oldItem = toDoData[idx]
-
-      const newItem = {
-        ...oldItem,
-        done: !oldItem.done,
-      }
-
-      const newArray = [...toDoData.slice(0, idx), newItem, ...toDoData.slice(idx + 1)]
-
-      return {
-        toDoData: newArray,
-      }
-    })
-  }
-
-  clearCompleted = () => {
-    this.setState(({ toDoData }) => {
-      const newArray = toDoData.filter((el) => !el.done)
-
-      return {
-        toDoData: newArray,
-      }
-    })
-  }
-
-  updateFilter = (status) => {
-    this.setState(() => ({
-      filter: status,
-    }))
-  }
-
-  filterTodoTasks = () => {
-    const { toDoData, filter } = this.state
-
+  const filterTodoTasks = () => {
     let filteredData
 
     if (filter === 'all') {
       filteredData = [...toDoData]
+    } else if (filter === 'active') {
+      filteredData = [...toDoData].filter((el) => !el.done)
     } else {
-      filteredData = [...toDoData].filter((el) => el.done === filter)
+      filteredData = [...toDoData].filter((el) => el.done)
     }
 
     return filteredData
   }
 
-  render() {
-    const { toDoData } = this.state
-    const toDoCount = toDoData.filter((el) => !el.done).length
-
-    return (
-      <div>
-        <NewTaskForm onItemAdded={this.addItem} />
-        <section className="main">
-          <TaskList
-            todos={this.filterTodoTasks()}
-            onDeleted={this.deleteItem}
-            onToggleDone={this.onToggleDone}
-          />
-          <Footer
-            toDo={toDoCount}
-            clearCompleted={this.clearCompleted}
-            updateFilter={this.updateFilter}
-          />
-        </section>
-      </div>
-    )
-  }
+  return (
+    <div>
+      <NewTaskForm onItemAdded={addItem} />
+      <section className="main">
+        <TaskList
+          todos={filterTodoTasks()}
+          onDeleted={deleteItem}
+          onToggleDone={onToggleDone}
+        />
+        <Footer
+          toDo={toDoData}
+          clearCompleted={clearCompleted}
+          updateFilter={updateFilter}
+          selectedBtn={filter}
+        />
+      </section>
+    </div>
+  )
 }
+
+export default App
